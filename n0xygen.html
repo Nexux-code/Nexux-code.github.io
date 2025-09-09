@@ -1,1 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>n0xygen</title>
+  <style>
+    /* Basic reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body, html { width: 100%; height: 100%; overflow: hidden; background: #000; }
 
+    /* Container for launch animation */
+    #launch {
+      position: absolute;
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      background: #000;
+      z-index: 10;
+    }
+
+    /* Comet streak */
+    .comet {
+      position: absolute;
+      width: 4px; height: 200px;
+      background: linear-gradient(to bottom, #fff, rgba(255,255,255,0));
+      border-radius: 50%;
+      transform-origin: top center;
+      animation: shoot 1.5s ease-out forwards;
+    }
+
+    @keyframes shoot {
+      0%   { transform: translate(-50%, -50%) rotate(45deg) scaleY(0); opacity: 1; }
+      70%  { transform: translate(200%, 200%) rotate(45deg) scaleY(1); opacity: 1; }
+      100% { transform: translate(300%, 300%) rotate(45deg) scaleY(1); opacity: 0; }
+    }
+
+    /* Fade-out overlay */
+    #overlay {
+      position: absolute; width: 100%; height: 100%;
+      background: black; opacity: 1;
+      transition: opacity 1s ease-out;
+      z-index: 9;
+    }
+
+    /* Main content (hidden initially) */
+    #main {
+      opacity: 0;
+      transition: opacity 1s ease-in;
+      color: #fff; font-family: 'Segoe UI', sans-serif;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100vh; text-align: center; padding: 20px;
+      background: radial-gradient(circle at center, #010101, #000);
+    }
+
+    #main h1 {
+      font-size: 4rem; letter-spacing: 0.2em; margin-bottom: 0.5em;
+      text-transform: uppercase;
+    }
+
+    #main p {
+      font-size: 1.25rem; max-width: 600px; line-height: 1.5;
+      color: #ccc;
+    }
+
+    #main a {
+      margin-top: 2em; padding: 0.75em 2em;
+      background: #1e90ff; color: #fff; text-decoration: none;
+      border-radius: 4px; transition: background 0.3s;
+    }
+    #main a:hover { background: #104e8b; }
+  </style>
+</head>
+<body>
+
+  <!-- Launch Animation -->
+  <div id="launch">
+    <div class="comet"></div>
+    <div id="overlay"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div id="main">
+    <h1>n0xygen</h1>
+    <p>Welcome aboard. Breathing new life into digital experiences—one pulse at a time.</p>
+    <a href="#explore">Explore</a>
+  </div>
+
+  <script>
+    // When comet animation ends, fade out launch and reveal main content
+    const launch = document.getElementById('launch');
+    const overlay = document.getElementById('overlay');
+    const main = document.getElementById('main');
+    const comet = document.querySelector('.comet');
+
+    comet.addEventListener('animationend', () => {
+      overlay.style.opacity = '0';
+      setTimeout(() => {
+        launch.style.display = 'none';
+        main.style.opacity = '1';
+        document.body.style.overflow = 'auto';
+      }, 1000);
+    });
+  </script>
+
+</body>
+</html>
