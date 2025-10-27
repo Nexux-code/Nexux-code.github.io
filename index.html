@@ -1,190 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>N0xygen Logo</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-    
-    <style>
-        /* 1. Set up the full-page background and centering */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: #000000; /* Black background */
-            color: #FFFFFF; /* White text */
-            
-            /* Use Flexbox to center content */
-            display: flex;
-            flex-direction: column; /* Stack items vertically */
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-            box-sizing: border-box; /* Include padding in height calculation */
-            min-height: 100vh;
-        }
-
-        /* 2. Style the logo image */
-        .logo-image {
-            max-width: 90%;
-            width: 500px; 
-            height: auto;
-            display: block;
-        }
-
-        /* 3. Style for the new Gemini API button */
-        .gemini-btn {
-            font-family: 'Orbitron', sans-serif; /* Futuristic font */
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #FFFFFF;
-            background-color: transparent;
-            border: 2px solid #FFFFFF;
-            border-radius: 8px;
-            padding: 12px 24px;
-            margin-top: 40px; /* Space below the logo */
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .gemini-btn:hover {
-            background-color: #FFFFFF;
-            color: #000000;
-        }
-
-        .gemini-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* 4. Style for the loader */
-        .loader {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #FFFFFF;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* 5. Style for the Gemini API result container */
-        .gemini-result-container {
-            font-family: 'Inter', sans-serif; /* Clean font for readability */
-            font-size: 1rem;
-            line-height: 1.6;
-            color: #EEEEEE;
-            max-width: 600px;
-            margin-top: 20px;
-            min-height: 50px; /* Reserve space to avoid layout jump */
-            text-align: left;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Centered Image</title>
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: #000;
+  }
+  .wrap {
+    height: 100%;
+    display: grid;
+    place-items: center;       /* centers both axes */
+  }
+  img {
+    max-width: 100vw;
+    max-height: 100vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;       /* show full image without crop */
+    object-position: center;   /* keep centered */
+  }
+</style>
 </head>
 <body>
-
-    <img src="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/YOUR_IMAGE_NAME.png" 
-         alt="N0xygen by N0xy Logo" 
-         class="logo-image">
-
-    <button id="gemini-button" class="gemini-btn">✨ Generate Space Fact</button>
-
-    <div id="loader" class="loader" style="display: none;"></div>
-
-    <div id="gemini-result" class="gemini-result-container"></div>
-
-
-    <script>
-        // Add click listener to the button
-        document.getElementById('gemini-button').addEventListener('click', callGeminiApi);
-
-        async function callGeminiApi() {
-            // --- 1. Get DOM elements and set up UI ---
-            const button = document.getElementById('gemini-button');
-            const resultDiv = document.getElementById('gemini-result');
-            const loader = document.getElementById('loader');
-
-            button.disabled = true;
-            loader.style.display = 'block';
-            resultDiv.textContent = ''; // Clear previous result
-
-            // --- 2. Define API properties ---
-            // Per instructions, apiKey is an empty string and will be populated by the environment
-            const apiKey = ""; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-
-            // --- 3. Define the prompts for the LLM ---
-            const systemPrompt = "You are an astrophysicist and science communicator. You share mind-blowing facts about space, black holes, and the universe in an exciting, concise, and easy-to-understand way.";
-            const userQuery = "Tell me one mind-blowing fact about space or the universe. Keep it to a single paragraph.";
-
-            const payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                systemInstruction: {
-                    parts: [{ text: systemPrompt }]
-                },
-            };
-
-            // --- 4. Call the API with retry logic ---
-            let responseData = null;
-            let retries = 3;
-            let delay = 1000; // 1 second
-
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (response.ok) {
-                        responseData = await response.json();
-                        break; // Success! Exit the loop.
-                    }
-                    // If response is not ok (e.g., 500, 429), it will retry after delay
-                    
-                } catch (error) {
-                    // This catches network errors. We'll retry.
-                }
-
-                // Don't wait after the last attempt
-                if (i < retries - 1) {
-                    await new Promise(res => setTimeout(res, delay));
-                    delay *= 2; // Exponential backoff
-                }
-            }
-
-            // --- 5. Handle the response ---
-            loader.style.display = 'none';
-            button.disabled = false;
-
-            if (responseData) {
-                try {
-                    const text = responseData.candidates[0].content.parts[0].text;
-                    resultDiv.textContent = text;
-                } catch (e) {
-                    console.error("Error parsing response:", e);
-                    resultDiv.textContent = "Sorry, I couldn't get a fact. The response was unusual.";
-                }
-            } else {
-                console.error("API request failed after all retries.");
-                resultDiv.textContent = "Sorry, I'm having trouble connecting. Please try again later.";
-            }
-        }
-    </script>
-
+  <div class="wrap">
+    <img src="namenoxy.png" alt="Image">
+  </div>
 </body>
 </html>
